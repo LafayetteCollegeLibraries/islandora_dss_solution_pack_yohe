@@ -1,0 +1,121 @@
+<?php
+
+/**
+ * @file Core functionality for the Yohe Photo Albums collection
+ * @author griffinj@lafayette.edu
+ *
+ */
+
+  // Require all composer-based dependencies
+require 'vendor/autoload.php';
+
+require_once dirname(__FILE__) . '/theme/theme.inc';
+
+/**
+ * Implements hook_theme().
+ */
+function dss_yohe_theme_registry_alter(&$items) {
+
+  /*
+  return array(
+    'islandora_basic_collection' => array(
+      'file' => 'theme/theme.inc',
+      'template' => 'theme/islandora-basic-collection',
+      'pattern' => 'islandora_basic_collection__',
+      'variables' => array('islandora_object' => NULL),
+    ),
+  */
+
+  //$items['islandora_basic_collection_wrapper']['includes'][0] = drupal_get_path('module', 'dss_yohe') . '/theme/theme.inc';
+}
+
+function dss_yohe_preprocess_islandora_book_book(array &$variables) {
+
+  $object = $variables['object'];
+
+  /**
+   * Collection-specific rendering for the Book Object
+   *
+   */
+  $parent_collection = array_shift($object->getParents());
+
+  if(preg_match('/Yohe/', $parent_collection)) {
+
+    // Not set for any uncommon namespaces (e. g. Fedora and OpenAnnotation ontologies)
+    EasyRdf_Namespace::set('oa', 'http://www.w3.org/ns/oa#');
+
+    // The graph need not be named
+    /*
+    $rels_ext_graph = new EasyRdf_Graph('info:fedora/' . $object->id);
+    $rels_ext_graph->parse($object['RELS-EXT']->content);
+
+    $source = $rels_ext_graph->resource();
+    $selector = $source->get('oa:hasSelector');
+
+    dpm($rels_ext_graph->dump('text'));
+    dpm($source->dump('text'));
+    dpm($selector->getUri());
+    */
+
+    // Retrieve all selectors for the Book Object
+    //$selector->getUri();
+
+
+    /*
+    $doc = new DOMDocument();
+    $doc->loadXML($object['RELS-EXT']->content);
+
+    /**
+     * @see FedoraRelationships
+     *
+     * /
+    $namespaces = array('rdf' => RDF_URI,
+			'fedora' => FEDORA_RELS_EXT_URI,
+			'fedora-model' => FEDORA_MODEL_URI,
+			'islandora' => ISLANDORA_RELS_EXT_URI,
+			'oa' => OA_URI,
+			'cnt' => RDF_CONTENT_URI);
+
+    /**
+     * @see FedoraRelationships::getXpath
+     *
+     * /
+    $xpath = new DomXPath($doc);
+    foreach ($namespaces as $alias => $uri) {
+
+      $xpath->registerNamespace($alias, $uri);
+    }
+
+    //$description_upper = $xpath->query('/rdf:RDF/rdf:Description[@rdf:about="'.$subject.'"]');
+    foreach($xpath->query('/rdf:RDF/rdf:Description/oa:hasSelector/@rdf:resource') as $selector_resource) {
+
+      //dpm((string) $selector_resource);
+    }
+
+    dpm($selector_objects);
+    dpm($object['RELS-EXT']->content);
+    */
+  }
+}
+
+/**
+ * New theme hook for Islandora Collection Objects within the Yohe Albums
+ *
+ * Implements hook_theme().
+ */
+function dss_yohe_theme($existing, $type, $theme, $path) {
+
+  return array(
+    'islandora_basic_collection_yohe' => array(
+      'file' => 'theme/theme.inc',
+      'template' => 'theme/islandora-basic-collection-yohe',
+      'pattern' => 'islandora_basic_collection_yohe__',
+      'variables' => array('islandora_object' => NULL, 'collection_results' => NULL),
+					       ),
+    'islandora_basic_collection_yohe_wrapper' => array(
+      'file' => 'theme/theme.inc',
+      'template' => 'theme/islandora-basic-collection-yohe-wrapper',
+      'variables' => array('islandora_object' => NULL),
+    ),
+	       );
+}
